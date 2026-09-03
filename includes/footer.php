@@ -28,7 +28,7 @@
             <h4>Contacto</h4>
             <ul>
                 <li><a href="tel:+50400000000">+504 0000 0000</a></li>
-                <li><a href="mailto:contacto@amslegalsolutions.hn">contacto@amslegalsolutions.hn</a></li>
+                <li><a href="mailto:gmoncada@amslegalsolutions.com">gmoncada@amslegalsolutions.com</a></li>
                 <li><span>Boulevard Morazán, Tegucigalpa</span></li>
             </ul>
         </div>
@@ -39,6 +39,6 @@
     </div>
 </footer>
 
-<script src="js/script.js?v=<?= filemtime(__DIR__ . '/../js/script.js') ?>"></script>
+<script src="includes/js/script.js?v=<?= filemtime(__DIR__ . '/js/script.js') ?>"></script>
 </body>
 </html>

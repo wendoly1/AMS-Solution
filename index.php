@@ -1,38 +1,6 @@
 <?php
 require 'includes/database.php';
-
-$mensaje = '';
-$exito = false;
-
-$areas = ['Derecho Corporativo', 'Derecho Laboral', 'Derecho Penal', 'Derecho Civil', 'Familia y Sucesiones', 'Propiedad Intelectual'];
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nombre   = trim($_POST['nombre'] ?? '');
-    $email    = trim($_POST['email'] ?? '');
-    $telefono = trim($_POST['telefono'] ?? '');
-    $area     = trim($_POST['area'] ?? '');
-    $consulta = trim($_POST['consulta'] ?? '');
-
-    if ($nombre === '' || $email === '' || $consulta === '') {
-        $mensaje = 'Por favor completa los campos obligatorios (nombre, correo y consulta).';
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $mensaje = 'El correo electrónico no es válido.';
-    } else {
-        $stmt = $pdo->prepare(
-            "INSERT INTO contactos (nombre, email, telefono, area, consulta, creado_en)
-             VALUES (:nombre, :email, :telefono, :area, :consulta, NOW())"
-        );
-        $stmt->execute([
-            ':nombre'   => $nombre,
-            ':email'    => $email,
-            ':telefono' => $telefono,
-            ':area'     => $area !== '' ? $area : null,
-            ':consulta' => $consulta,
-        ]);
-        $exito = true;
-        $mensaje = '¡Gracias! Hemos recibido tu solicitud y te contactaremos pronto.';
-    }
-}
+require 'includes/contact_handler.php';
 
 require 'includes/header.php';
 ?>
@@ -42,7 +10,6 @@ require 'includes/header.php';
         <span class="hero-ring r1" aria-hidden="true"></span>
         <span class="hero-ring r2" aria-hidden="true"></span>
         <div class="hero-grid reveal-group" data-stagger="0.22">
-            <span class="overline">Firma de abogados · Desde 2008</span>
             <h1>Estrategia legal<br>a la altura de tus<br><span class="accent-gold">decisiones</span><em> más importantes.</em></h1>
             <div class="hero-cta-row">
                 <p>Asesoría jurídica integral para empresas y personas en Honduras. Unimos rigor técnico, discreción y un trato cercano para proteger lo que más importa.</p>
@@ -204,7 +171,7 @@ require 'includes/header.php';
                 </div>
                 <div class="contact-info-item">
                     <span class="info-label">Correo</span>
-                    <span class="info-value">contacto@amslegalsolutions.hn</span>
+                    <a class="info-value" href="mailto:gmoncada@amslegalsolutions.com">gmoncada@amslegalsolutions.com</a>
                 </div>
                 <div class="contact-info-item">
                     <span class="info-label">Horario</span>
@@ -220,36 +187,40 @@ require 'includes/header.php';
                 </div>
             <?php endif; ?>
 
-            <form method="POST" class="contact-form">
+            <form method="POST" action="index.php#contacto" class="contact-form">
+                <div class="form-honeypot" aria-hidden="true">
+                    <label for="sitio_web_inicio">Sitio web</label>
+                    <input type="text" id="sitio_web_inicio" name="sitio_web" tabindex="-1" autocomplete="off">
+                </div>
                 <div class="form-field">
                     <label for="nombre">Nombre completo</label>
-                    <input type="text" id="nombre" name="nombre" required>
+                    <input type="text" id="nombre" name="nombre" value="<?= htmlspecialchars($formData['nombre'], ENT_QUOTES, 'UTF-8') ?>" required>
                 </div>
 
                 <div class="form-row">
                     <div class="form-field">
                         <label for="email">Correo</label>
-                        <input type="email" id="email" name="email" required>
+                        <input type="email" id="email" name="email" value="<?= htmlspecialchars($formData['email'], ENT_QUOTES, 'UTF-8') ?>" required>
                     </div>
                     <div class="form-field">
                         <label for="telefono">Teléfono</label>
-                        <input type="tel" id="telefono" name="telefono">
+                        <input type="tel" id="telefono" name="telefono" value="<?= htmlspecialchars($formData['telefono'], ENT_QUOTES, 'UTF-8') ?>">
                     </div>
                 </div>
 
                 <div class="form-field">
                     <label for="area">Área de interés</label>
                     <select id="area" name="area">
-                        <option value="" selected>Selecciona un área</option>
+                        <option value="" <?= $formData['area'] === '' ? 'selected' : '' ?>>Selecciona un área</option>
                         <?php foreach ($areas as $opcion): ?>
-                            <option value="<?= htmlspecialchars($opcion) ?>"><?= htmlspecialchars($opcion) ?></option>
+                            <option value="<?= htmlspecialchars($opcion) ?>" <?= $formData['area'] === $opcion ? 'selected' : '' ?>><?= htmlspecialchars($opcion) ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
 
                 <div class="form-field">
                     <label for="consulta">Cuéntanos tu caso</label>
-                    <textarea id="consulta" name="consulta" rows="5" required></textarea>
+                    <textarea id="consulta" name="consulta" rows="5" required><?= htmlspecialchars($formData['consulta'], ENT_QUOTES, 'UTF-8') ?></textarea>
                 </div>
 
                 <button type="submit" class="btn btn-dark btn-block">Enviar solicitud</button>

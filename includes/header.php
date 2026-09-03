@@ -18,7 +18,6 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                 <img src="img/ams-logo-header.png" alt="">
             </span>
             <span class="logo-copy">
-                <span class="logo-title">AMS LEGAL</span>
                 <span class="logo-location">TEGUCIGALPA · HONDURAS</span>
             </span>
         </a>

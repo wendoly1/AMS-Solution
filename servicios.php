@@ -51,7 +51,6 @@
             </div>
             <div class="area-cta-row">
                 <a href="contacto.php" class="area-consult-btn">Consultar sobre Derecho Corporativo</a>
-                <a href="#top" class="area-back-link">Volver arriba →</a>
             </div>
         </div>
     </div>
@@ -92,7 +91,6 @@
             </div>
             <div class="area-cta-row">
                 <a href="contacto.php" class="area-consult-btn">Consultar sobre Derecho Laboral</a>
-                <a href="#top" class="area-back-link">Volver arriba →</a>
             </div>
         </div>
     </div>
@@ -133,7 +131,6 @@
             </div>
             <div class="area-cta-row">
                 <a href="contacto.php" class="area-consult-btn">Consultar sobre Derecho Penal</a>
-                <a href="#top" class="area-back-link">Volver arriba →</a>
             </div>
         </div>
     </div>
@@ -174,7 +171,6 @@
             </div>
             <div class="area-cta-row">
                 <a href="contacto.php" class="area-consult-btn">Consultar sobre Derecho Civil</a>
-                <a href="#top" class="area-back-link">Volver arriba →</a>
             </div>
         </div>
     </div>
@@ -215,7 +211,6 @@
             </div>
             <div class="area-cta-row">
                 <a href="contacto.php" class="area-consult-btn">Consultar sobre Familia y Sucesiones</a>
-                <a href="#top" class="area-back-link">Volver arriba →</a>
             </div>
         </div>
     </div>
@@ -256,7 +251,6 @@
             </div>
             <div class="area-cta-row">
                 <a href="contacto.php" class="area-consult-btn">Consultar sobre Propiedad Intelectual</a>
-                <a href="#top" class="area-back-link">Volver arriba →</a>
             </div>
         </div>
     </div>

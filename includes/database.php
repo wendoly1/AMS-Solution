@@ -13,10 +13,22 @@
  * el panel de Hostinger (hPanel > Bases de datos MySQL).
  */
 
-$DB_HOST = 'localhost';
-$DB_NAME = 'ams_legal';
-$DB_USER = 'root';
-$DB_PASS = '';
+$hostActual = strtolower(preg_replace('/:\d+$/', '', $_SERVER['HTTP_HOST'] ?? 'localhost'));
+$esLocal = in_array($hostActual, ['localhost', '127.0.0.1', '::1'], true);
+
+if ($esLocal) {
+    // Credenciales locales (XAMPP)
+    $DB_HOST = 'localhost';
+    $DB_NAME = 'ams_legal';
+    $DB_USER = 'root';
+    $DB_PASS = '';
+} else {
+    // Credenciales del hosting (Hostinger)
+    $DB_HOST = 'localhost';
+    $DB_NAME = 'u564821758_ams_legal';
+    $DB_USER = 'u564821758_admin';
+    $DB_PASS = '5#zVN3H56Cqd';
+}
 
 try {
     $pdo = new PDO(

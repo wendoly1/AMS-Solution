@@ -3,8 +3,8 @@
 <footer class="site-footer" id="site-footer">
     <div class="container footer-grid">
         <div class="footer-brand">
-            <span class="footer-logo">AMS Legal Solutions</span>
-            <span class="footer-tagline">Tegucigalpa · Honduras</span>
+            <span class="footer-logo"><?= site_e(site_setting('site.name', 'AMS Legal Solutions')) ?></span>
+            <span class="footer-tagline"><?= site_e(site_setting('site.location', 'Tegucigalpa · Honduras')) ?></span>
             <p class="footer-desc">Asesoría jurídica integral para empresas y personas. Defendemos tus intereses con criterio y discreción.</p>
         </div>
         <div class="footer-col">
@@ -27,14 +27,15 @@
         <div class="footer-col">
             <h4>Contacto</h4>
             <ul>
-                <li><a href="tel:+50400000000">+504 0000 0000</a></li>
-                <li><a href="mailto:gmoncada@amslegalsolutions.com">gmoncada@amslegalsolutions.com</a></li>
-                <li><span>Boulevard Morazán, Tegucigalpa</span></li>
+                <?php $footerPhone = site_setting('contact.phone', '+504 0000 0000'); $footerEmail = site_setting('contact.email', 'gmoncada@amslegalsolutions.com'); ?>
+                <li><a href="tel:<?= site_e(preg_replace('/[^\d+]/', '', $footerPhone)) ?>"><?= site_e($footerPhone) ?></a></li>
+                <li><a href="mailto:<?= site_e($footerEmail) ?>"><?= site_e($footerEmail) ?></a></li>
+                <li><span><?= site_e(site_setting('contact.address', 'Boulevard Morazán, Tegucigalpa, Honduras')) ?></span></li>
             </ul>
         </div>
     </div>
     <div class="container footer-bottom">
-        <span>&copy; <?= date('Y') ?> AMS Legal Solutions. Todos los derechos reservados.</span>
+        <span>&copy; <?= date('Y') ?> <?= site_e(site_setting('site.name', 'AMS Legal Solutions')) ?>. Todos los derechos reservados.</span>
         <span class="footer-legal"><a href="#">Aviso legal</a><a href="#">Privacidad</a></span>
     </div>
 </footer>

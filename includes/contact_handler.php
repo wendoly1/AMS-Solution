@@ -1,15 +1,9 @@
 <?php
 
-const CONTACT_RECIPIENT = 'gmoncada@amslegalsolutions.com';
+require_once __DIR__ . '/content.php';
+$contactRecipient = site_setting('contact.email', 'gmoncada@amslegalsolutions.com');
 
-$areas = [
-    'Derecho Corporativo',
-    'Derecho Laboral',
-    'Derecho Penal',
-    'Derecho Civil',
-    'Familia y Sucesiones',
-    'Propiedad Intelectual',
-];
+$areas = array_column(site_json_setting('content.services', default_services()), 'name');
 
 $mensaje = '';
 $exito = false;
@@ -73,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $cabeceras = implode("\r\n", [
             'MIME-Version: 1.0',
             'Content-Type: text/plain; charset=UTF-8',
-            'From: AMS Legal Solutions <' . CONTACT_RECIPIENT . '>',
+            'From: AMS Legal Solutions <' . $contactRecipient . '>',
             'Reply-To: ' . $formData['email'],
             'X-Mailer: PHP/' . phpversion(),
         ]);
@@ -81,15 +75,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // XAMPP no incluye un servidor SMTP local. El operador @ evita que una
         // advertencia de infraestructura exponga rutas internas al visitante;
         // el resultado se gestiona con el mensaje de error del formulario.
-        $correoEnviado = @mail(CONTACT_RECIPIENT, $asunto, $cuerpo, $cabeceras);
+        $correoEnviado = @mail($contactRecipient, $asunto, $cuerpo, $cabeceras);
 
         if ($correoEnviado) {
             $exito = true;
             $mensaje = '¡Gracias! Tu solicitud fue enviada correctamente. Te contactaremos pronto.';
             $formData = array_fill_keys(array_keys($formData), '');
         } else {
-            error_log('PHP no pudo enviar la solicitud de contacto a ' . CONTACT_RECIPIENT);
-            $mensaje = 'No pudimos enviar tu solicitud en este momento. Inténtalo nuevamente o escríbenos directamente a ' . CONTACT_RECIPIENT . '.';
+            error_log('PHP no pudo enviar la solicitud de contacto a ' . $contactRecipient);
+            $mensaje = 'No pudimos enviar tu solicitud en este momento. Inténtalo nuevamente o escríbenos directamente a ' . $contactRecipient . '.';
         }
     }
 }

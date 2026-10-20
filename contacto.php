@@ -9,25 +9,26 @@ require 'includes/header.php';
     <div class="container contact-grid booking-grid">
         <div class="contact-intro">
             <span class="overline">Contacto</span>
-            <h1>Agenda tu<br>consulta inicial.</h1>
-            <p>Cuéntanos tu caso. Te responderemos con discreción y agendaremos una primera reunión sin compromiso.</p>
+            <h1><?= site_e(site_setting('contact.heading', 'Agenda tu consulta inicial.')) ?></h1>
+            <p><?= site_e(site_setting('contact.intro', 'Cuéntanos tu caso. Te responderemos con discreción y agendaremos una primera reunión sin compromiso.')) ?></p>
 
             <div class="contact-info-list">
                 <div class="contact-info-item">
                     <span class="info-label">Oficina</span>
-                    <span class="info-value">Boulevard Morazán, Tegucigalpa, Honduras</span>
+                    <span class="info-value"><?= site_e(site_setting('contact.address', 'Boulevard Morazán, Tegucigalpa, Honduras')) ?></span>
                 </div>
                 <div class="contact-info-item">
                     <span class="info-label">Teléfono</span>
-                    <span class="info-value">+504 0000 0000</span>
+                    <span class="info-value"><?= site_e(site_setting('contact.phone', '+504 0000 0000')) ?></span>
                 </div>
                 <div class="contact-info-item">
                     <span class="info-label">Correo</span>
-                    <a class="info-value" href="mailto:gmoncada@amslegalsolutions.com">gmoncada@amslegalsolutions.com</a>
+                    <?php $contactEmail = site_setting('contact.email', 'gmoncada@amslegalsolutions.com'); ?>
+                    <a class="info-value" href="mailto:<?= site_e($contactEmail) ?>"><?= site_e($contactEmail) ?></a>
                 </div>
                 <div class="contact-info-item">
                     <span class="info-label">Horario</span>
-                    <span class="info-value">Lunes a viernes · 8:00 – 17:00</span>
+                    <span class="info-value"><?= site_e(site_setting('contact.hours', 'Lunes a viernes · 8:00 – 17:00')) ?></span>
                 </div>
             </div>
         </div>

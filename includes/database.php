@@ -41,6 +41,6 @@ try {
         ]
     );
 } catch (PDOException $e) {
-    // En producción esto no debe mostrar el error real al usuario
-    die('Error de conexión a la base de datos: ' . $e->getMessage());
+    error_log('Error de conexión a la base de datos: ' . $e->getMessage());
+    $pdo = null;
 }

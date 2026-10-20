@@ -10,9 +10,9 @@ require 'includes/header.php';
         <span class="hero-ring r1" aria-hidden="true"></span>
         <span class="hero-ring r2" aria-hidden="true"></span>
         <div class="hero-grid reveal-group" data-stagger="0.22">
-            <h1>Estrategia legal<br>a la altura de tus<br><span class="accent-gold">decisiones</span><em> más importantes.</em></h1>
+            <h1><?= nl2br(site_e(site_setting('home.hero_title', 'Estrategia legal a la altura de tus decisiones más importantes.'))) ?></h1>
             <div class="hero-cta-row">
-                <p>Asesoría jurídica integral para empresas y personas en Honduras. Unimos rigor técnico, discreción y un trato cercano para proteger lo que más importa.</p>
+                <p><?= site_e(site_setting('home.hero_description', 'Asesoría jurídica integral para empresas y personas en Honduras. Unimos rigor técnico, discreción y un trato cercano para proteger lo que más importa.')) ?></p>
                 <div class="hero-actions">
                     <a href="#contacto" class="btn btn-light">Solicitar consulta →</a>
                     <a href="#areas" class="btn btn-outline-light">Ver áreas</a>
@@ -23,19 +23,19 @@ require 'includes/header.php';
     <div class="container">
         <div class="stats-grid">
             <div class="stat-block">
-                <span class="stat-number" data-count="16" data-suffix="+">0+</span>
+                <span class="stat-number" data-count="<?= site_e(site_setting('stats.years', '16')) ?>" data-suffix="+">0+</span>
                 <span class="stat-label">Años de ejercicio</span>
             </div>
             <div class="stat-block">
-                <span class="stat-number" data-count="900" data-suffix="+">0+</span>
+                <span class="stat-number" data-count="<?= site_e(site_setting('stats.cases', '900')) ?>" data-suffix="+">0+</span>
                 <span class="stat-label">Casos resueltos</span>
             </div>
             <div class="stat-block">
-                <span class="stat-number" data-count="12" data-suffix="">0</span>
+                <span class="stat-number" data-count="<?= site_e(site_setting('stats.lawyers', '12')) ?>" data-suffix="">0</span>
                 <span class="stat-label">Abogados expertos</span>
             </div>
             <div class="stat-block">
-                <span class="stat-number" data-count="98" data-suffix="%">0%</span>
+                <span class="stat-number" data-count="<?= site_e(site_setting('stats.satisfaction', '98')) ?>" data-suffix="%">0%</span>
                 <span class="stat-label">Clientes satisfechos</span>
             </div>
         </div>
@@ -47,47 +47,19 @@ require 'includes/header.php';
         <div class="practice-header reveal">
             <div>
                 <span class="overline">Áreas de práctica</span>
-                <h2>Especialidades de la firma</h2>
+                <h2><?= site_e(site_setting('home.services_title', 'Especialidades de la firma')) ?></h2>
             </div>
-            <p>Seis áreas de práctica con equipos dedicados, cada una respaldada por años de experiencia ante tribunales hondureños.</p>
+            <p><?= site_e(site_setting('home.services_text', 'Seis áreas de práctica con equipos dedicados, cada una respaldada por años de experiencia ante tribunales hondureños.')) ?></p>
         </div>
         <div class="practice-list reveal-group">
-            <a href="servicios.php#corporativo" class="practice-row">
-                <span class="practice-num">01</span>
-                <span class="practice-name">Derecho Corporativo</span>
-                <span class="practice-desc">Constitución de sociedades, gobernanza, fusiones y contratos mercantiles.</span>
+            <?php foreach (site_json_setting('content.services', default_services()) as $index => $service): ?>
+            <a href="servicios.php#<?= site_e($service['slug']) ?>" class="practice-row">
+                <span class="practice-num"><?= sprintf('%02d', $index + 1) ?></span>
+                <span class="practice-name"><?= site_e($service['name']) ?></span>
+                <span class="practice-desc"><?= site_e($service['summary']) ?></span>
                 <span class="practice-arrow">→</span>
             </a>
-            <a href="servicios.php#laboral" class="practice-row">
-                <span class="practice-num">02</span>
-                <span class="practice-name">Derecho Laboral</span>
-                <span class="practice-desc">Relaciones laborales, conflictos, cumplimiento y negociación colectiva.</span>
-                <span class="practice-arrow">→</span>
-            </a>
-            <a href="servicios.php#penal" class="practice-row">
-                <span class="practice-num">03</span>
-                <span class="practice-name">Derecho Penal</span>
-                <span class="practice-desc">Defensa técnica, litigio estratégico y representación judicial.</span>
-                <span class="practice-arrow">→</span>
-            </a>
-            <a href="servicios.php#civil" class="practice-row">
-                <span class="practice-num">04</span>
-                <span class="practice-name">Derecho Civil</span>
-                <span class="practice-desc">Contratos, obligaciones, bienes y responsabilidad civil.</span>
-                <span class="practice-arrow">→</span>
-            </a>
-            <a href="servicios.php#familia" class="practice-row">
-                <span class="practice-num">05</span>
-                <span class="practice-name">Familia y Sucesiones</span>
-                <span class="practice-desc">Divorcios, custodia, herencias y régimen patrimonial.</span>
-                <span class="practice-arrow">→</span>
-            </a>
-            <a href="servicios.php#propiedad-intelectual" class="practice-row">
-                <span class="practice-num">06</span>
-                <span class="practice-name">Propiedad Intelectual</span>
-                <span class="practice-desc">Registro de marcas, patentes y protección de activos intangibles.</span>
-                <span class="practice-arrow">→</span>
-            </a>
+            <?php endforeach; ?>
         </div>
     </div>
 </section>
@@ -95,14 +67,14 @@ require 'includes/header.php';
 <section class="about-section" id="firma">
     <div class="container about-grid reveal-group">
         <div class="about-photo">
-            <img src="img/ams-office-reception.jpg" alt="Recepción de las oficinas de AMS Legal">
+            <img src="<?= site_e(site_setting('site.office_image', 'img/ams-office-reception.jpg')) ?>" alt="Recepción de las oficinas de AMS Legal">
         
         </div>
         <div class="about-text">
             <span class="overline">Sobre la firma</span>
-            <h2>Un despacho construido sobre la confianza y los resultados.</h2>
-            <p>AMS Legal Solutions nace en Tegucigalpa con una convicción: la excelencia jurídica también se mide por la cercanía. Acompañamos a empresas y familias en cada decisión, con una mirada estratégica y profundamente ética.</p>
-            <p>Nuestro equipo multidisciplinario combina experiencia litigiosa, visión de negocio y un compromiso real con cada cliente.</p>
+            <h2><?= site_e(site_setting('home.about_title', 'Un despacho construido sobre la confianza y los resultados.')) ?></h2>
+            <p><?= site_e(site_setting('home.about_p1', 'AMS Legal Solutions nace en Tegucigalpa con una convicción: la excelencia jurídica también se mide por la cercanía. Acompañamos a empresas y familias en cada decisión, con una mirada estratégica y profundamente ética.')) ?></p>
+            <p><?= site_e(site_setting('home.about_p2', 'Nuestro equipo multidisciplinario combina experiencia litigiosa, visión de negocio y un compromiso real con cada cliente.')) ?></p>
             <div class="values-trio">
                 <div class="values-trio-item">
                     <div class="num">Ética</div>
@@ -126,29 +98,19 @@ require 'includes/header.php';
         <div class="team-section-header reveal">
             <div>
                 <span class="overline">El equipo</span>
-                <h2>Abogados que te representan</h2>
+                <h2><?= site_e(site_setting('home.team_title', 'Abogados que te representan')) ?></h2>
             </div>
             <a href="equipo.php" class="view-all">Ver todo el equipo</a>
         </div>
         <div class="team-grid reveal-group">
-            <a href="equipo.php#martinez" class="team-card team-card-link">
-                <div class="team-photo-wrap"><img src="img/abogado-martinez.jpg" alt="A. Martínez"></div>
-                <h3>A. Martínez</h3>
-                <p class="team-role">Socio fundador</p>
-                <p class="team-area">Corporativo y Mercantil</p>
+            <?php foreach (site_json_setting('content.team', default_team()) as $member): ?>
+            <a href="equipo.php#<?= site_e($member['slug']) ?>" class="team-card team-card-link">
+                <div class="team-photo-wrap"><img src="<?= site_e($member['image']) ?>" alt="<?= site_e($member['name']) ?>"></div>
+                <h3><?= site_e($member['name']) ?></h3>
+                <p class="team-role"><?= site_e($member['role']) ?></p>
+                <p class="team-area"><?= site_e($member['area']) ?></p>
             </a>
-            <a href="equipo.php#andino" class="team-card team-card-link">
-                <div class="team-photo-wrap"><img src="img/abogado-andino.jpg" alt="S. Andino"></div>
-                <h3>S. Andino</h3>
-                <p class="team-role">Socia</p>
-                <p class="team-area">Laboral y Litigio</p>
-            </a>
-            <a href="equipo.php#calix" class="team-card team-card-link">
-                <div class="team-photo-wrap"><img src="img/abogado-calix.jpg" alt="R. Cálix"></div>
-                <h3>R. Cálix</h3>
-                <p class="team-role">Asociado senior</p>
-                <p class="team-area">Penal y Procesal</p>
-            </a>
+            <?php endforeach; ?>
         </div>
     </div>
 </section>
@@ -157,25 +119,26 @@ require 'includes/header.php';
     <div class="container contact-grid reveal-group">
         <div class="contact-intro">
             <span class="overline">Contacto</span>
-            <h1>Agenda tu<br>consulta inicial.</h1>
-            <p>Cuéntanos tu caso. Te responderemos con discreción y agendaremos una primera reunión sin compromiso.</p>
+            <h1><?= site_e(site_setting('contact.heading', 'Agenda tu consulta inicial.')) ?></h1>
+            <p><?= site_e(site_setting('contact.intro', 'Cuéntanos tu caso. Te responderemos con discreción y agendaremos una primera reunión sin compromiso.')) ?></p>
 
             <div class="contact-info-list">
                 <div class="contact-info-item">
                     <span class="info-label">Oficina</span>
-                    <span class="info-value">Boulevard Morazán, Tegucigalpa, Honduras</span>
+                    <span class="info-value"><?= site_e(site_setting('contact.address', 'Boulevard Morazán, Tegucigalpa, Honduras')) ?></span>
                 </div>
                 <div class="contact-info-item">
                     <span class="info-label">Teléfono</span>
-                    <span class="info-value">+504 0000 0000</span>
+                    <span class="info-value"><?= site_e(site_setting('contact.phone', '+504 0000 0000')) ?></span>
                 </div>
                 <div class="contact-info-item">
                     <span class="info-label">Correo</span>
-                    <a class="info-value" href="mailto:gmoncada@amslegalsolutions.com">gmoncada@amslegalsolutions.com</a>
+                    <?php $contactEmail = site_setting('contact.email', 'gmoncada@amslegalsolutions.com'); ?>
+                    <a class="info-value" href="mailto:<?= site_e($contactEmail) ?>"><?= site_e($contactEmail) ?></a>
                 </div>
                 <div class="contact-info-item">
                     <span class="info-label">Horario</span>
-                    <span class="info-value">Lunes a viernes · 8:00 – 17:00</span>
+                    <span class="info-value"><?= site_e(site_setting('contact.hours', 'Lunes a viernes · 8:00 – 17:00')) ?></span>
                 </div>
             </div>
         </div>

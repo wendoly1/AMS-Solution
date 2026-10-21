@@ -1,5 +1,5 @@
 <?php require 'includes/header.php'; ?>
-<?php $team = site_json_setting('content.team', default_team()); ?>
+<?php $team = site_team(); ?>
 
 <section class="bg-dark firma-hero team-hero">
     <span class="firma-hero-ring" aria-hidden="true"></span>
@@ -14,7 +14,7 @@
     <div class="container team-grid team-grid-bios">
         <?php foreach ($team as $member): ?>
         <div class="team-card" id="<?= site_e($member['slug']) ?>">
-            <div class="team-photo-wrap"><img src="<?= site_e($member['image']) ?>" alt="<?= site_e($member['name']) ?>"></div>
+            <div class="team-photo-wrap"><img src="<?= site_e(site_media_url($member['image'])) ?>" alt="<?= site_e($member['name']) ?>"></div>
             <h3><?= site_e($member['name']) ?></h3>
             <p class="team-role"><?= site_e($member['role']) ?></p>
             <p class="team-area"><?= site_e($member['area']) ?></p>

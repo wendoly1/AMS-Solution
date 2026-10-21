@@ -3,7 +3,7 @@
 require_once __DIR__ . '/content.php';
 $contactRecipient = site_setting('contact.email', 'gmoncada@amslegalsolutions.com');
 
-$areas = array_column(site_json_setting('content.services', default_services()), 'name');
+$areas = array_column(site_services(), 'name');
 
 $mensaje = '';
 $exito = false;
@@ -32,6 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($formData['area'] !== '' && !in_array($formData['area'], $areas, true)) {
         $mensaje = 'Selecciona un área de interés válida.';
     } else {
+        $contactoGuardado = false;
         try {
             $stmt = $pdo->prepare(
                 'INSERT INTO contactos (nombre, email, telefono, area, consulta, creado_en)
@@ -44,6 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':area' => $formData['area'] !== '' ? $formData['area'] : null,
                 ':consulta' => $formData['consulta'],
             ]);
+            $contactoGuardado = true;
         } catch (Throwable $error) {
             error_log('No se pudo guardar el contacto: ' . $error->getMessage());
         }
@@ -75,11 +77,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // XAMPP no incluye un servidor SMTP local. El operador @ evita que una
         // advertencia de infraestructura exponga rutas internas al visitante;
         // el resultado se gestiona con el mensaje de error del formulario.
-        $correoEnviado = @mail($contactRecipient, $asunto, $cuerpo, $cabeceras);
+        $correoEnviado = false;
+        if (filter_var($contactRecipient, FILTER_VALIDATE_EMAIL)) {
+            try {
+                $correoEnviado = @mail($contactRecipient, $asunto, $cuerpo, $cabeceras);
+            } catch (Throwable $error) {
+                error_log('No se pudo entregar el correo de contacto: ' . $error->getMessage());
+            }
+        }
 
-        if ($correoEnviado) {
+        if ($correoEnviado || $contactoGuardado) {
             $exito = true;
-            $mensaje = '¡Gracias! Tu solicitud fue enviada correctamente. Te contactaremos pronto.';
+            $mensaje = '¡Gracias! Hemos recibido tu solicitud. Te contactaremos pronto.';
             $formData = array_fill_keys(array_keys($formData), '');
         } else {
             error_log('PHP no pudo enviar la solicitud de contacto a ' . $contactRecipient);

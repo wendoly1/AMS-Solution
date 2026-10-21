@@ -283,6 +283,8 @@ img { max-width: 100%; }
     margin: 0;
 }
 
+.hero h1 .hero-title-line { display: block; }
+
 .hero h1 .accent-gold { color: var(--gold); }
 
 .hero h1 em {

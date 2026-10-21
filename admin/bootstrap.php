@@ -2,8 +2,16 @@
 
 require_once __DIR__ . '/../includes/database.php';
 require_once __DIR__ . '/../includes/content.php';
+require_once __DIR__ . '/editor.php';
+require_once __DIR__ . '/auth.php';
+date_default_timezone_set('America/Tegucigalpa');
+
+header('Cache-Control: no-store, private');
+header('X-Robots-Tag: noindex, nofollow');
+header('X-Content-Type-Options: nosniff');
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
+    ini_set('session.use_strict_mode', '1');
     $sessionDirectory = sys_get_temp_dir();
     if (is_dir($sessionDirectory) && is_writable($sessionDirectory)) {
         session_save_path($sessionDirectory);
@@ -39,6 +47,8 @@ $pdo->exec(
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
 );
 
+admin_prepare_auth();
+
 function admin_exists(): bool
 {
     global $pdo;
@@ -47,7 +57,14 @@ function admin_exists(): bool
 
 function admin_is_logged_in(): bool
 {
-    return !empty($_SESSION['admin_user_id']);
+    global $pdo;
+    if (empty($_SESSION['admin_user_id'])) return false;
+    $statement = $pdo->prepare('SELECT auth_version FROM admin_users WHERE id = ?');
+    $statement->execute([$_SESSION['admin_user_id']]);
+    $version = $statement->fetchColumn();
+    if ($version !== false && isset($_SESSION['admin_auth_version']) && (int)$version === (int)$_SESSION['admin_auth_version']) return true;
+    $_SESSION = [];
+    return false;
 }
 
 function admin_require_login(): void
@@ -87,11 +104,11 @@ function admin_save_setting(string $key, string $value): void
 
 function admin_upload_image(string $field, string $folder): ?string
 {
-    if (empty($_FILES[$field]['tmp_name']) || ($_FILES[$field]['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+    if (!isset($_FILES[$field]) || ($_FILES[$field]['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
         return null;
     }
 
-    if ($_FILES[$field]['error'] !== UPLOAD_ERR_OK || $_FILES[$field]['size'] > 5 * 1024 * 1024) {
+    if ($_FILES[$field]['error'] !== UPLOAD_ERR_OK || !is_string($_FILES[$field]['tmp_name']) || !is_uploaded_file($_FILES[$field]['tmp_name']) || $_FILES[$field]['size'] > 5 * 1024 * 1024) {
         throw new RuntimeException('La imagen no pudo subirse o supera los 5 MB.');
     }
 
@@ -99,6 +116,9 @@ function admin_upload_image(string $field, string $folder): ?string
     $extensions = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
     if (!isset($extensions[$mime])) {
         throw new RuntimeException('Solo se permiten imágenes JPG, PNG o WebP.');
+    }
+    if (!getimagesize($_FILES[$field]['tmp_name'])) {
+        throw new RuntimeException('El archivo no contiene una imagen válida.');
     }
 
     $relativeFolder = 'uploads/' . trim($folder, '/');
@@ -112,7 +132,85 @@ function admin_upload_image(string $field, string $folder): ?string
         throw new RuntimeException('No se pudo guardar la imagen.');
     }
 
+    $GLOBALS['admin_new_uploads'][] = $absoluteFolder . '/' . $filename;
+
     return $relativeFolder . '/' . $filename;
+}
+
+function admin_validate_setting(string $value, array $definition): void
+{
+    [$label, , $type] = $definition;
+    // El contrato permite texto vacío; no equivale a una clave ausente.
+    if ($value === '' && $type !== 'number') {
+        return;
+    }
+    if ($type === 'url') {
+        $parts = parse_url($value);
+        if (!filter_var($value, FILTER_VALIDATE_URL) || !is_array($parts)
+            || !in_array(strtolower($parts['scheme'] ?? ''), ['http', 'https'], true)
+            || empty($parts['host']) || isset($parts['user']) || isset($parts['pass'])
+            || isset($parts['query']) || isset($parts['fragment']) || !in_array($parts['path'] ?? '', ['', '/'], true)) {
+            throw new RuntimeException('Ingresa el dominio completo con https://, sin rutas ni parámetros.');
+        }
+    }
+    if ($type === 'email' && !filter_var($value, FILTER_VALIDATE_EMAIL)) {
+        throw new RuntimeException('Ingresa un correo válido.');
+    }
+    if ($type === 'link' && site_external_link($value) === '') {
+        throw new RuntimeException('Ingresa un enlace completo que comience con https:// en: ' . $label . '.');
+    }
+    if ($type === 'button_link' && site_button_link($value) === '') {
+        throw new RuntimeException('Usa una página del sitio, un ancla como #contacto o un enlace completo con https:// en: ' . $label . '.');
+    }
+    if ($type === 'whatsapp' && (!preg_match('/^[+\d\s()-]+$/D', $value) || strlen(preg_replace('/\D/', '', $value)) < 8 || strlen(preg_replace('/\D/', '', $value)) > 15)) {
+        throw new RuntimeException('Ingresa el WhatsApp con código de país, por ejemplo +504 9999 9999.');
+    }
+    if ($type === 'number' && (!ctype_digit($value) || strlen($value) > 9)) {
+        throw new RuntimeException('Ingresa un número entero positivo en: ' . $label . '.');
+    }
+    if ($label === 'Clientes satisfechos (%)' && (int) $value > 100) {
+        throw new RuntimeException('El porcentaje no puede superar 100.');
+    }
+}
+
+function admin_validate_items($items, array $fields): array
+{
+    if (!is_array($items) || count($items) > 100) {
+        throw new RuntimeException('La lista enviada no es válida.');
+    }
+    $slugs = [];
+    foreach ($items as $index => $item) {
+        if (!ctype_digit((string) $index) || !is_array($item)) {
+            throw new RuntimeException('El elemento enviado no es válido.');
+        }
+        foreach ($fields as $field) {
+            if (!isset($item[$field]) || !is_string($item[$field]) || ($field === 'name' && trim($item[$field]) === '')) {
+                throw new RuntimeException('Completa todos los campos del elemento.');
+            }
+        }
+        $slug = $item['slug'] ?? '';
+        if (!is_string($slug) || !preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/D', $slug) || isset($slugs[$slug])) {
+            throw new RuntimeException('El identificador del elemento no es válido o está repetido.');
+        }
+        $slugs[$slug] = true;
+    }
+    return $items;
+}
+
+function admin_image_path(string $value): string
+{
+    $path = site_media_url($value);
+    if (preg_match('~^https?://~i', $path)) {
+        return $path;
+    }
+    return preg_match('~^(?:img|uploads)/~', $path) && strpos(rawurldecode($path), '..') === false
+        ? $path : '';
+}
+
+function admin_image_preview(string $value): string
+{
+    $path = admin_image_path($value);
+    return $path === '' || preg_match('~^https?://~i', $path) ? $path : '../' . $path;
 }
 
 function admin_content_sections(): array
@@ -123,12 +221,21 @@ function admin_content_sections(): array
             'fields' => [
                 'site.name' => ['Nombre de la firma', 'AMS Legal Solutions', 'text'],
                 'site.location' => ['Ubicación corta', 'Tegucigalpa · Honduras', 'text'],
+                'site.url' => ['URL del sitio (dominio canónico)', 'https://amslegalsolutions.com', 'url'],
+                'site.footer_description' => ['Descripción del pie de página', 'Asesoría jurídica integral para empresas y personas. Defendemos tus intereses con criterio y discreción.', 'textarea'],
                 'contact.address' => ['Dirección', 'Boulevard Morazán, Tegucigalpa, Honduras', 'text'],
                 'contact.phone' => ['Teléfono', '+504 0000 0000', 'text'],
                 'contact.email' => ['Correo', 'gmoncada@amslegalsolutions.com', 'email'],
                 'contact.hours' => ['Horario', 'Lunes a viernes · 8:00 – 17:00', 'text'],
                 'contact.heading' => ['Título de contacto', 'Agenda tu consulta inicial.', 'text'],
                 'contact.intro' => ['Texto de contacto', 'Cuéntanos tu caso. Te responderemos con discreción y agendaremos una primera reunión sin compromiso.', 'textarea'],
+                'contact.whatsapp' => ['WhatsApp con código de país', '', 'whatsapp'],
+                'contact.map_url' => ['Enlace de ubicación en Google Maps', '', 'link'],
+                'social.facebook' => ['Página de Facebook', '', 'link'],
+                'social.instagram' => ['Perfil de Instagram', '', 'link'],
+                'social.linkedin' => ['Página de LinkedIn', '', 'link'],
+                'header.cta_label' => ['Texto del botón del encabezado', 'Agendar cita', 'text'],
+                'header.cta_url' => ['Destino del botón del encabezado', 'contacto.php', 'button_link'],
             ],
         ],
         'home' => [
@@ -136,6 +243,10 @@ function admin_content_sections(): array
             'fields' => [
                 'home.hero_title' => ['Título principal', 'Estrategia legal a la altura de tus decisiones más importantes.', 'textarea'],
                 'home.hero_description' => ['Descripción principal', 'Asesoría jurídica integral para empresas y personas en Honduras. Unimos rigor técnico, discreción y un trato cercano para proteger lo que más importa.', 'textarea'],
+                'home.primary_label' => ['Texto del primer botón', 'Solicitar consulta →', 'text'],
+                'home.primary_url' => ['Destino del primer botón', '#contacto', 'button_link'],
+                'home.secondary_label' => ['Texto del segundo botón', 'Ver áreas', 'text'],
+                'home.secondary_url' => ['Destino del segundo botón', '#areas', 'button_link'],
                 'home.services_title' => ['Título de áreas', 'Especialidades de la firma', 'text'],
                 'home.services_text' => ['Introducción de áreas', 'Seis áreas de práctica con equipos dedicados, cada una respaldada por años de experiencia ante tribunales hondureños.', 'textarea'],
                 'home.about_title' => ['Título sobre la firma', 'Un despacho construido sobre la confianza y los resultados.', 'textarea'],

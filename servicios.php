@@ -1,5 +1,5 @@
 <?php require 'includes/header.php'; ?>
-<?php $services = site_json_setting('content.services', default_services()); ?>
+<?php $services = site_services(); ?>
 
 <section class="bg-dark areas-intro" id="top">
     <div class="container">

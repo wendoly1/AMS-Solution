@@ -1,5 +1,5 @@
 <?php
-require 'includes/database.php';
+require_once __DIR__ . '/includes/database.php';
 require 'includes/contact_handler.php';
 
 require 'includes/header.php';
@@ -10,12 +10,16 @@ require 'includes/header.php';
         <span class="hero-ring r1" aria-hidden="true"></span>
         <span class="hero-ring r2" aria-hidden="true"></span>
         <div class="hero-grid reveal-group" data-stagger="0.22">
-            <h1><?= nl2br(site_e(site_setting('home.hero_title', 'Estrategia legal a la altura de tus decisiones más importantes.'))) ?></h1>
+            <?php
+            $heroTitle = site_setting('home.hero_title', 'Estrategia legal a la altura de tus decisiones más importantes.');
+            $isOriginalHeroTitle = preg_replace('/\s+/u', ' ', trim($heroTitle)) === 'Estrategia legal a la altura de tus decisiones más importantes.';
+            ?>
+            <h1><?php if ($isOriginalHeroTitle): ?><span class="hero-title-line">Estrategia legal</span> <span class="hero-title-line">a la altura de tus</span> <span class="hero-title-line"><span class="accent-gold">decisiones</span> <em>más importantes.</em></span><?php else: ?><?= nl2br(site_e($heroTitle)) ?><?php endif; ?></h1>
             <div class="hero-cta-row">
                 <p><?= site_e(site_setting('home.hero_description', 'Asesoría jurídica integral para empresas y personas en Honduras. Unimos rigor técnico, discreción y un trato cercano para proteger lo que más importa.')) ?></p>
                 <div class="hero-actions">
-                    <a href="#contacto" class="btn btn-light">Solicitar consulta →</a>
-                    <a href="#areas" class="btn btn-outline-light">Ver áreas</a>
+                    <a href="<?= site_e(site_button_url('home.primary_url', '#contacto')) ?>" class="btn btn-light"><?= site_e(site_setting('home.primary_label', 'Solicitar consulta →')) ?></a>
+                    <a href="<?= site_e(site_button_url('home.secondary_url', '#areas')) ?>" class="btn btn-outline-light"><?= site_e(site_setting('home.secondary_label', 'Ver áreas')) ?></a>
                 </div>
             </div>
         </div>
@@ -52,7 +56,7 @@ require 'includes/header.php';
             <p><?= site_e(site_setting('home.services_text', 'Seis áreas de práctica con equipos dedicados, cada una respaldada por años de experiencia ante tribunales hondureños.')) ?></p>
         </div>
         <div class="practice-list reveal-group">
-            <?php foreach (site_json_setting('content.services', default_services()) as $index => $service): ?>
+            <?php foreach (site_services() as $index => $service): ?>
             <a href="servicios.php#<?= site_e($service['slug']) ?>" class="practice-row">
                 <span class="practice-num"><?= sprintf('%02d', $index + 1) ?></span>
                 <span class="practice-name"><?= site_e($service['name']) ?></span>
@@ -67,7 +71,7 @@ require 'includes/header.php';
 <section class="about-section" id="firma">
     <div class="container about-grid reveal-group">
         <div class="about-photo">
-            <img src="<?= site_e(site_setting('site.office_image', 'img/ams-office-reception.jpg')) ?>" alt="Recepción de las oficinas de AMS Legal">
+            <img src="<?= site_e(site_media('site.office_image', 'img/ams-office-reception.jpg')) ?>" alt="Recepción de las oficinas de AMS Legal">
         
         </div>
         <div class="about-text">
@@ -103,9 +107,9 @@ require 'includes/header.php';
             <a href="equipo.php" class="view-all">Ver todo el equipo</a>
         </div>
         <div class="team-grid reveal-group">
-            <?php foreach (site_json_setting('content.team', default_team()) as $member): ?>
+            <?php foreach (site_team() as $member): ?>
             <a href="equipo.php#<?= site_e($member['slug']) ?>" class="team-card team-card-link">
-                <div class="team-photo-wrap"><img src="<?= site_e($member['image']) ?>" alt="<?= site_e($member['name']) ?>"></div>
+                <div class="team-photo-wrap"><img src="<?= site_e(site_media_url($member['image'])) ?>" alt="<?= site_e($member['name']) ?>"></div>
                 <h3><?= site_e($member['name']) ?></h3>
                 <p class="team-role"><?= site_e($member['role']) ?></p>
                 <p class="team-area"><?= site_e($member['area']) ?></p>
@@ -140,6 +144,7 @@ require 'includes/header.php';
                     <span class="info-label">Horario</span>
                     <span class="info-value"><?= site_e(site_setting('contact.hours', 'Lunes a viernes · 8:00 – 17:00')) ?></span>
                 </div>
+                <?php foreach (site_contact_links() as $label => $url): ?><div class="contact-info-item"><span class="info-label"><?= site_e($label) ?></span><a class="info-value" href="<?= site_e($url) ?>" target="_blank" rel="noopener noreferrer"><?= site_e($label) ?> ↗</a></div><?php endforeach; ?>
             </div>
         </div>
 

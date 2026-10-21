@@ -5,7 +5,7 @@
         <div class="footer-brand">
             <span class="footer-logo"><?= site_e(site_setting('site.name', 'AMS Legal Solutions')) ?></span>
             <span class="footer-tagline"><?= site_e(site_setting('site.location', 'Tegucigalpa · Honduras')) ?></span>
-            <p class="footer-desc">Asesoría jurídica integral para empresas y personas. Defendemos tus intereses con criterio y discreción.</p>
+            <p class="footer-desc"><?= site_e(site_setting('site.footer_description', 'Asesoría jurídica integral para empresas y personas. Defendemos tus intereses con criterio y discreción.')) ?></p>
         </div>
         <div class="footer-col">
             <h4>Firma</h4>
@@ -18,10 +18,13 @@
         <div class="footer-col">
             <h4>Áreas</h4>
             <ul>
-                <li><a href="servicios.php#corporativo">Corporativo</a></li>
-                <li><a href="servicios.php#laboral">Laboral</a></li>
-                <li><a href="servicios.php#penal">Penal</a></li>
-                <li><a href="servicios.php#familia">Familia</a></li>
+                <?php
+                $footerServices = site_setting('content.services', '') === ''
+                    ? [['slug' => 'corporativo', 'name' => 'Corporativo'], ['slug' => 'laboral', 'name' => 'Laboral'], ['slug' => 'penal', 'name' => 'Penal'], ['slug' => 'familia', 'name' => 'Familia']]
+                    : array_slice(site_services(), 0, 4);
+                foreach ($footerServices as $service): ?>
+                <li><a href="servicios.php#<?= site_e($service['slug']) ?>"><?= site_e($service['name']) ?></a></li>
+                <?php endforeach; ?>
             </ul>
         </div>
         <div class="footer-col">
@@ -31,6 +34,7 @@
                 <li><a href="tel:<?= site_e(preg_replace('/[^\d+]/', '', $footerPhone)) ?>"><?= site_e($footerPhone) ?></a></li>
                 <li><a href="mailto:<?= site_e($footerEmail) ?>"><?= site_e($footerEmail) ?></a></li>
                 <li><span><?= site_e(site_setting('contact.address', 'Boulevard Morazán, Tegucigalpa, Honduras')) ?></span></li>
+                <?php foreach (site_contact_links() as $label => $url): ?><li><a href="<?= site_e($url) ?>" target="_blank" rel="noopener noreferrer"><?= site_e($label) ?> ↗</a></li><?php endforeach; ?>
             </ul>
         </div>
     </div>

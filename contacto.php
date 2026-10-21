@@ -1,5 +1,5 @@
 <?php
-require 'includes/database.php';
+require_once __DIR__ . '/includes/database.php';
 require 'includes/contact_handler.php';
 
 require 'includes/header.php';
@@ -30,6 +30,7 @@ require 'includes/header.php';
                     <span class="info-label">Horario</span>
                     <span class="info-value"><?= site_e(site_setting('contact.hours', 'Lunes a viernes · 8:00 – 17:00')) ?></span>
                 </div>
+                <?php foreach (site_contact_links() as $label => $url): ?><div class="contact-info-item"><span class="info-label"><?= site_e($label) ?></span><a class="info-value" href="<?= site_e($url) ?>" target="_blank" rel="noopener noreferrer"><?= site_e($label) ?> ↗</a></div><?php endforeach; ?>
             </div>
         </div>
 

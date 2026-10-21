@@ -12,7 +12,7 @@
 <section class="bg-dark firma-history">
     <div class="container about-grid">
         <div class="firma-history-photo">
-            <img src="<?= site_e(site_setting('site.office_image', 'img/ams-office-reception.jpg')) ?>" alt="Recepción de las oficinas de AMS Legal">
+            <img src="<?= site_e(site_media('site.office_image', 'img/ams-office-reception.jpg')) ?>" alt="Recepción de las oficinas de AMS Legal">
         </div>
         <div class="firma-history-text">
             <span class="overline">Nuestra historia</span>

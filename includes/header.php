@@ -12,8 +12,13 @@ $metaByPage = [
 ];
 [$pageTitle, $pageDescription] = $metaByPage[$currentPage] ?? [site_setting('site.name', 'AMS Legal Solutions'), 'Asesoría jurídica en Honduras.'];
 $canonicalPaths = ['index.php' => '', 'servicios.php' => 'servicios.php', 'sobre_la_firma.php' => 'sobre_la_firma.php', 'equipo.php' => 'equipo.php', 'contacto.php' => 'contacto.php'];
-$canonicalUrl = 'https://amslegalsolutions.com/' . ($canonicalPaths[$currentPage] ?? '');
-$siteLogo = site_setting('site.logo', 'img/ams-logo-header.png');
+$siteUrl = site_media_url(site_setting('site.url', 'https://amslegalsolutions.com'), 'https://amslegalsolutions.com');
+if (!preg_match('~^https?://~i', $siteUrl)) {
+    $siteUrl = 'https://amslegalsolutions.com';
+}
+$canonicalUrl = rtrim($siteUrl, '/') . '/' . ($canonicalPaths[$currentPage] ?? '');
+$siteLogo = site_media('site.logo', 'img/ams-logo-header.png');
+$siteFavicon = site_media('site.favicon', 'img/favicon.png');
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -23,8 +28,8 @@ $siteLogo = site_setting('site.logo', 'img/ams-logo-header.png');
     <title><?= site_e($pageTitle) ?></title>
     <meta name="description" content="<?= site_e($pageDescription) ?>">
     <link rel="canonical" href="<?= site_e($canonicalUrl) ?>">
-    <link rel="icon" type="image/png" sizes="512x512" href="img/favicon.png">
-    <link rel="apple-touch-icon" href="img/favicon.png">
+    <link rel="icon" href="<?= site_e($siteFavicon) ?>">
+    <link rel="apple-touch-icon" href="<?= site_e($siteFavicon) ?>">
     <link rel="stylesheet" href="css/style.css?v=<?= filemtime(__DIR__ . '/../css/style.css') ?>">
 </head>
 <body>
@@ -50,10 +55,10 @@ $siteLogo = site_setting('site.logo', 'img/ams-logo-header.png');
                 <li><a href="servicios.php" class="<?= $currentPage === 'servicios.php' ? 'active' : '' ?>">Áreas</a></li>
                 <li><a href="sobre_la_firma.php" class="<?= $currentPage === 'sobre_la_firma.php' ? 'active' : '' ?>">Firma</a></li>
                 <li><a href="equipo.php" class="<?= $currentPage === 'equipo.php' ? 'active' : '' ?>">Abogados</a></li>
-                <li class="mobile-nav-cta"><a href="contacto.php">Agendar cita</a></li>
+                <li class="mobile-nav-cta"><a href="<?= site_e(site_button_url('header.cta_url', 'contacto.php')) ?>"><?= site_e(site_setting('header.cta_label', 'Agendar cita')) ?></a></li>
             </ul>
         </nav>
-        <a href="contacto.php" class="header-cta">Agendar cita</a>
+        <a href="<?= site_e(site_button_url('header.cta_url', 'contacto.php')) ?>" class="header-cta"><?= site_e(site_setting('header.cta_label', 'Agendar cita')) ?></a>
     </div>
 </header>
 
